@@ -20,8 +20,10 @@ class Cell:
         self.section.pop_value(value)
 
     def unset_value(self):
-        self.column.push_value(self.value)
-        self.row.push_value(self.value)
-        self.section.push_value(self.value)
+        value = self.value
+        self.column.push_value(value)
+        self.row.push_value(value)
+        self.section.push_value(value)
         self.value = 0
+        return value
 

@@ -27,10 +27,24 @@ class Grid:
                 for y in range(height) ]
 
     def pprint(self):
-        grid = [ [ 0 for x in range(self.width) ] for y in range(self.height) ]
+        grid = [ [ ' ' for x in range(self.width) ] for y in range(self.height) ]
         for cell in self.cells:
-            grid[cell.y][cell.x] = cell.value
-        pprint(grid)
+            if cell.value != 0:
+                grid[cell.y][cell.x] = str(cell.value)
+
+        for y in range(self.height):
+            if y % 3 == 0:
+                print('|---|---|---|')
+            for x in range(self.width):
+                if x % 3 == 0:
+                    print('|', end='')
+                value = grid[y][x]
+                if value == 0:
+                    print(' ', end='')
+                else:
+                    print(value, end='')
+            print('|')
+        print('|---|---|---|')
 
     """
     Creates a real deep clone of the given grid

@@ -1,24 +1,39 @@
+from grid_solver import GridSolver
 from random import shuffle
 
-class GridSolver:
+class GridGenerator:
     def __init__(self, grid):
         self.grid = grid.copy()
 
-    def solve(self):
-        cells = list(self.grid.cells)
-        return self._solve(cells, 0)
+    def try_generate(self):
+        self._solve()
 
-    def _solve(self, cells, index):
+        solver = GridSolver(self.grid)
+        cells = list(self.grid.cells)
+        shuffle(cells)
+        for cell in cells:
+            value = cell.unset_value()
+            if self._count_solutions(self.grid.cells, 0) != 1:
+                cell.set_value(value)
+        return self.grid.copy()
+
+    def _solve(self):
+        cells = list(self.grid.cells)
+        self._inner_solve(cells, 0)
+
+    def _inner_solve(self, cells, index):
         if index == len(cells):
             return True
 
         cell = cells[index]
         if cell.value != 0:
-            return self._solve(cells, index + 1)
+            return self._inner_solve(cells, index + 1)
 
-        for value in cell.available_values():
+        values = list(cell.available_values())
+        shuffle(values)
+        for value in values:
             cell.set_value(value)
-            if self._solve(cells, index + 1):
+            if self._inner_solve(cells, index + 1):
                 return True
             cell.unset_value()
 
@@ -27,10 +42,6 @@ class GridSolver:
     """
     Counts the amount of solution, stopping after 2
     """
-    def count_solutions(self):
-        cells = list(self.grid.cells)
-        return self._count_solutions(cells, 0)
-
     def _count_solutions(self, cells, index):
         if index == len(cells):
             return 1

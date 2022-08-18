@@ -1,8 +1,7 @@
 import { CellCollection } from './cell-collection';
-import { intersection } from './helpers/set.helper';
 
 export class Cell {
-	value: number;
+	value: number | null;
 	constructor(
 		public x: number,
 		public y: number,
@@ -10,11 +9,11 @@ export class Cell {
 		private row: CellCollection,
 		private section: CellCollection
 	) {
-		this.value = 0;
+		this.value = null;
 	}
 
-	availableValues(): Set<number> {
-		return this.section.intersectValues(
+	availableValues(): number[] {
+		return this.section.intersect(
 			this.column,
 			this.row
 		);
@@ -28,11 +27,11 @@ export class Cell {
 	}
 
 	unsetValue(): number {
-		const value = this.value;
+		const value = this.value!;
 		this.column.pushValue(value);
 		this.row.pushValue(value);
 		this.section.pushValue(value);
-		this.value = 0;
+		this.value = null;
 		return value;
 	}
 }

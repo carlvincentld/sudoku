@@ -37,25 +37,6 @@ http
 			filePath = './index.html';
 		}
 
-		if (!fs.existsSync(filePath)) {
-			const basename = path.basename(filePath);
-			const dirname = path.dirname(filePath);
-
-			const entries = fs
-				.readdirSync(dirname, { withFileTypes: true })
-				.filter(x => 
-					x.isFile()
-						&& x.name.startsWith(basename)
-						&& x.name.replace(basename, '') in mimeTypes);
-
-			if (entries.length === 1) {
-				console.log(`${filePath} was not found, but ${entries[0].name} with a valid extension was found in the same folder.`);
-				filePath = path.join(dirname, entries[0].name);
-			} else if (entries.length > 1) {
-				console.log(`${filePath} was not found, but multiple files with valid extensions were found in the same folder`);
-			}
-		}
-
 		fs.readFile(filePath, (error, content) => {
 			if (error) {
 				if (error.code === 'ENOENT') {
@@ -77,4 +58,5 @@ http
 		});
 	})
 	.listen(port);
+
 console.log(`Server running at http://127.0.0.1:${port}/`);

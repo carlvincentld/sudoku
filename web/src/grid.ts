@@ -2,33 +2,36 @@ import { Cell } from './cell';
 import { CellCollection } from './cell-collection';
 import { range } from './helpers/array.helper';
 
+// ???: Inject the GridRenderer?
 export class Grid {
 	private _columns: CellCollection[];
 	private _rows: CellCollection[];
 	private _sections: CellCollection[];
 
 	cells: Cell[];
+	readonly MAX_VALUE: number;
 
 	constructor(
-		private _width: number,
-		private _height: number,
-		private _sectionCount: number
+		public readonly WIDTH: number,
+		public readonly HEIGHT: number,
+		public readonly SECTION_COUNT: number
 	) {
 		if (
-			this._width !== 9
-			|| this._height !== 9
-			|| this._sectionCount !== 9) {
+			this.WIDTH !== 9
+			|| this.HEIGHT !== 9
+			|| this.SECTION_COUNT !== 9) {
 			throw new Error('Only 9x9 gris of 9 sections are supported');
 		}
 
-		const valueCount = this._width * this._height / this._sectionCount;
+		const valueCount = this.WIDTH * this.HEIGHT / this.SECTION_COUNT;
+		this.MAX_VALUE = valueCount;
 
-		this._columns = range(this._width).map(() => new CellCollection(valueCount));
-		this._rows = range(this._height).map(() => new CellCollection(valueCount));
-		this._sections = range(this._sectionCount).map(() => new CellCollection(valueCount));
+		this._columns = range(this.WIDTH).map(() => new CellCollection(valueCount));
+		this._rows = range(this.HEIGHT).map(() => new CellCollection(valueCount));
+		this._sections = range(this.SECTION_COUNT).map(() => new CellCollection(valueCount));
 
-		this.cells = range(this._width)
-			.flatMap(x => range(this._height).map(y => {
+		this.cells = range(this.WIDTH)
+			.flatMap(x => range(this.HEIGHT).map(y => {
 				return new Cell(
 					x,
 					y,
@@ -41,7 +44,7 @@ export class Grid {
 	}
 
 	clone(): Grid {
-		const result = new Grid(this._width, this._height, this._sectionCount);
+		const result = new Grid(this.WIDTH, this.HEIGHT, this.SECTION_COUNT);
 		const ordering = (a: Cell, b: Cell) => { 
 			return a.x !== b.x ? b.x - a.x : b.y - a.y;
 		};
@@ -61,7 +64,7 @@ export class Grid {
 	}
 
 	prettyFormat(): string {
-		const grid = range(this._height).map(() => range(this._width)) as unknown as string[][];
+		const grid = range(this.HEIGHT).map(() => range(this.WIDTH)) as unknown as string[][];
 		for (let i = 0; i < this.cells.length; i++) {
 			const cell = this.cells[i]!;
 			grid[cell.y]![cell.x]! = `${cell.value ?? ' '}`;
@@ -77,36 +80,6 @@ export class Grid {
 			result += '\n';
 		}
 		return result;
-	}
-
-	render(parent: HTMLElement): void {
-		const cells = new Map(this.cells.map(c =>
-			[`${c.y},${c.x}`, c]));
-
-		const table = document.createElement('table');
-		for (let y = 0; y < this._height; y++) {
-			const tr = document.createElement('tr');
-			table.appendChild(tr);
-
-			for (let x = 0; x < this._width; x++) {
-				const td = document.createElement('td');
-				tr.appendChild(td);
-
-				const cell = cells.get(`${y},${x}`);
-				if (cell!.value === null) {
-					const input = document.createElement('input');
-					input.type = 'text';
-					td.appendChild(input);
-				} else {
-					const span = document.createElement('span');
-					span.classList.add('constant');
-					span.textContent = `${cell!.value}`;
-					td.appendChild(span);
-				}
-			}
-		}
-
-		parent.appendChild(table);
 	}
 }
 

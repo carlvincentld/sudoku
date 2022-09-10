@@ -17,3 +17,19 @@ export function shuffle<T>(array: Iterable<T>): T[] {
   }
 	return result;
 }
+
+export function groupBy<T, K>(iterable: Iterable<T>, keyFunc: (value: T, index: number) => K): Map<K, T[]> {
+	const array = Array.from(iterable);
+	return array.reduce(
+		(acc, current, index) => {
+			const key = keyFunc(current, index);
+			if (acc.has(key)) {
+				acc.get(key)!.push(current);
+			} else {
+				acc.set(key, [current]);
+			}
+			return acc;
+		},
+		new Map<K, T[]>()
+	);
+}

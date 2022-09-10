@@ -1,18 +1,18 @@
 import { Grid } from './grid';
 import { GridGenerator } from './grid-generator';
-import { GridRenderer } from './grid-renderer';
+import { RenderedSudokuGrid } from './renderer/rendered-sudoku-grid';
 
 function main() {
 	const width = 9;
 	const height = 9;
 	const sectionCount = 9;
 
-	const renderer = new GridRenderer();
-
 	const grid = new Grid(width, height, sectionCount);
 	const generator = new GridGenerator();
 	const generated = generator.generate(grid);
-	renderer.render(generated, document.body);
+
+	const rendered = new RenderedSudokuGrid(generated);
+	document.body.appendChild(rendered.el);
 }
 
 if (document.readyState === 'loading') {

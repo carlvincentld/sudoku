@@ -5,9 +5,9 @@ export class Cell {
 	constructor(
 		public x: number,
 		public y: number,
-		private column: CellCollection,
-		private row: CellCollection,
-		private section: CellCollection
+		public readonly column: CellCollection,
+		public readonly row: CellCollection,
+		public readonly section: CellCollection
 	) {
 		this.value = null;
 	}

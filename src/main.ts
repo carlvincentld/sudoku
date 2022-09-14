@@ -1,5 +1,5 @@
-import { Grid } from './grid';
-import { GridGenerator } from './grid-generator';
+//import { GridGenerator } from './grid/grid-generator';
+import { JigsawGrid } from './grid/jigsaw-grid';
 import { RenderedSudokuGrid } from './renderer/rendered-sudoku-grid';
 
 function main() {
@@ -7,11 +7,11 @@ function main() {
 	const height = 9;
 	const sectionCount = 9;
 
-	const grid = new Grid(width, height, sectionCount);
-	const generator = new GridGenerator();
-	const generated = generator.generate(grid);
+	const grid = new JigsawGrid(width, height, sectionCount);
+	//const generator = new GridGenerator();
+	//const generated = generator.generate(grid);
 
-	const rendered = new RenderedSudokuGrid(generated);
+	const rendered = new RenderedSudokuGrid(grid);
 	document.body.appendChild(rendered.el);
 }
 

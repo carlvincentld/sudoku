@@ -1,6 +1,6 @@
 import { Grid } from './grid';
 import { Cell } from './cell';
-import { shuffle } from './helpers/array.helper';
+import { shuffle } from '../helpers/array.helper';
 
 const ITERATION_LIMIT = 10_000;
 

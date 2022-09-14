@@ -1,14 +1,16 @@
-import { Cell } from './cell';
+import { Cell, Position } from './cell';
 import { CellCollection } from './cell-collection';
-import { range } from './helpers/array.helper';
+import { range } from '../helpers/array.helper';
 
-// ???: Inject the GridRenderer?
+export type CellsByPosition = ReadonlyMap<Position, Cell>;
+
 export class Grid {
-	private _columns: CellCollection[];
-	private _rows: CellCollection[];
-	private _sections: CellCollection[];
+	protected _columns: CellCollection[];
+	protected _rows: CellCollection[];
+	protected _sections: CellCollection[];
 
-	cells: Cell[];
+	readonly cells: Cell[];
+	readonly cellsByPosition: CellsByPosition;
 	readonly MAX_VALUE: number;
 
 	constructor(
@@ -26,9 +28,9 @@ export class Grid {
 		const valueCount = this.WIDTH * this.HEIGHT / this.SECTION_COUNT;
 		this.MAX_VALUE = valueCount;
 
-		this._columns = range(this.WIDTH).map(() => new CellCollection(valueCount));
-		this._rows = range(this.HEIGHT).map(() => new CellCollection(valueCount));
-		this._sections = range(this.SECTION_COUNT).map(() => new CellCollection(valueCount));
+		this._columns = range(this.WIDTH).map((i) => new CellCollection(valueCount, i));
+		this._rows = range(this.HEIGHT).map((i) => new CellCollection(valueCount, i));
+		this._sections = range(this.SECTION_COUNT).map((i) => new CellCollection(valueCount, i));
 
 		this.cells = range(this.WIDTH)
 			.flatMap(x => range(this.HEIGHT).map(y => {
@@ -41,6 +43,9 @@ export class Grid {
 						Math.floor(x / 3)
 						+ 3 * Math.floor(y / 3)]!);
 			}));
+		this.cellsByPosition = new Map(
+			this.cells.map(x => [x.position(), x])
+		);
 	}
 
 	clone(): Grid {
@@ -68,6 +73,25 @@ export class Grid {
 		for (let i = 0; i < this.cells.length; i++) {
 			const cell = this.cells[i]!;
 			grid[cell.y]![cell.x]! = `${cell.value ?? ' '}`;
+		}
+
+		let result = "";
+		for (let i = 0; i < grid.length; i++) {
+			const row = grid[i]!;
+			for (let j = 0; j < row.length; j++) {
+				const value = row[j]!;
+				result += `${value}, `;
+			}
+			result += '\n';
+		}
+		return result;
+	}
+
+	prettyFormatSection(): string  {
+		const grid = range(this.HEIGHT).map(() => range(this.WIDTH)) as unknown as string[][];
+		for (let i = 0; i < this.cells.length; i++) {
+			const cell = this.cells[i]!;
+			grid[cell.y]![cell.x]! = `${cell.section.ord}`;
 		}
 
 		let result = "";

@@ -1,5 +1,5 @@
-import { CellCollection } from "../cell-collection";
-import { Grid } from "../grid";
+import { CellCollection } from "../grid/cell-collection";
+import { Grid } from "../grid/grid";
 import { groupBy } from "../helpers/array.helper";
 import { RenderedCell } from "./rendered-cell";
 import { RenderedControls } from "./rendered-controls";
@@ -44,7 +44,7 @@ export class RenderedSudokuGrid {
 
 			for (let x = 0; x < grid.WIDTH; x++) {
 				const cell = cells.get(`${y},${x}`)!
-				const renderedCell = new RenderedCell(cell, control);
+				const renderedCell = new RenderedCell(cell, grid, control);
 
                 renderedCell.registerOnValueChanged(this.refreshValidation.bind(this));
                 this._renderedCells.push(renderedCell);

@@ -20,3 +20,10 @@ export function intersection<T>(
 
 	return result;
 }
+
+export function equivalent<T>(
+	xs: Set<T>,
+	ys: Set<T>
+): boolean {
+	return xs.size === ys.size && Array.from(xs).every(x => ys.has(x));
+}

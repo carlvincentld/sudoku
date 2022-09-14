@@ -18,7 +18,7 @@ Planned features:
 npm install
 ```
 
-No additionnal step are required.
+No additionnal steps are required.
 
 # Usage
 

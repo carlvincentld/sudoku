@@ -9,30 +9,6 @@ table, .controls {
 	margin: 2em;
 }
 
-tr {
-	border-bottom: 1px solid black;
-}
-
-tr:nth-of-type(3n) {
-	border-bottom-width: 3px;
-}
-
-tr:first-child {
-	border-top: 3px solid black;
-}
-
-td {
-	border-right: 1px solid black;
-}
-
-td:nth-of-type(3n) {
-	border-right-width: 3px;
-}
-
-td:first-child {
-	border-left: 3px solid black;
-}
-
 td {
 	width: 2em;
 	height: 2em;
@@ -42,7 +18,14 @@ td {
 
 	text-align: center;
 	vertical-align: middle;
+
+	border: 1px solid black;
 }
+
+td.section-edge-top { border-top-width: 3px; }
+td.section-edge-bottom { border-bottom-width: 3px; }
+td.section-edge-left { border-left-width: 3px; }
+td.section-edge-right { border-right-width: 3px; }
 
 td.constant {
 	opacity: unset;

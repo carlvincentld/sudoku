@@ -1,4 +1,4 @@
-import { Grid } from "../grid";
+import { Grid } from "../grid/grid";
 
 export class RenderedControls {
     readonly el: HTMLElement;

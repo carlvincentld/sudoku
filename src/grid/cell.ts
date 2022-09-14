@@ -1,13 +1,15 @@
 import { CellCollection } from './cell-collection';
 
+export type Position = `${number},${number}`;
+
 export class Cell {
 	value: number | null;
 	constructor(
-		public x: number,
-		public y: number,
-		public readonly column: CellCollection,
-		public readonly row: CellCollection,
-		public readonly section: CellCollection
+		public readonly x: number,
+		public readonly y: number,
+		public column: CellCollection,
+		public row: CellCollection,
+		public section: CellCollection
 	) {
 		this.value = null;
 	}
@@ -33,5 +35,9 @@ export class Cell {
 		this.section.pushValue(value);
 		this.value = null;
 		return value;
+	}
+
+	position(offsetY: number = 0, offsetX: number = 0): Position {
+		return `${this.y - offsetY},${this.x - offsetX}`;
 	}
 }

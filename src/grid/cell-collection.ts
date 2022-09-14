@@ -1,9 +1,11 @@
-import { range } from './helpers/array.helper';
+import { range } from '../helpers/array.helper';
 
+// TODO: Find a better name, since they don't represent a collection
+//       Rather a constraint set.
 export class CellCollection {
 	availableValues: RangeSet<1, number>;
 
-	constructor(valueCount: number) {
+	constructor(valueCount: number, public readonly ord: number) {
 		this.availableValues = new RangeSet(1, valueCount + 1);
 	}
 

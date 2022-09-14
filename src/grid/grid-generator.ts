@@ -2,7 +2,7 @@ import { Grid } from './grid';
 import { Cell } from './cell';
 import { shuffle } from '../helpers/array.helper';
 
-const ITERATION_LIMIT = 10_000;
+const ITERATION_LIMIT = 100_000;
 
 export class GridGenerator {
 	iteration: number = 0;

@@ -6,9 +6,13 @@ Features includes:
 - 9x9 grid generation;
 - Pencil markings;
 - Grid validation;
+- Puzzle grid generator;
 
 Planned features:
-- Puzzle grid generator;
+- Menu for choosing the desired type of grid;
+- Highlighting numbers corresponding to the current control;
+- Rerolling grids automatically when it's unsolvable;
+- Injecting a random seed;
 - Variable size grid;
 - Generating grids by difficulty;
 

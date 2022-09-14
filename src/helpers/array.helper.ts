@@ -13,6 +13,15 @@ export function unique<T>(array: Array<T>): Array<T> {
 	return Array.from(new Set(array));
 }
 
+export function zip<A, B>(a: Array<A>, b: Array<B>): Array<[A, B]> {
+	const result = new Array<[A, B]>();
+	const maxLength = Math.max(a.length, b.length);
+	for (let i = 0; i < maxLength; i++) {
+		result.push([a[i]!, b[i]!]);
+	}
+	return result;
+}
+
 export function shuffle<T>(array: Iterable<T>): T[] {
 	const result = Array.from(array);
 	for (let i = result.length - 1; i > 0; i--) {

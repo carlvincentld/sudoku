@@ -9,10 +9,8 @@ Features includes:
 - Puzzle grid generator;
 
 Planned features:
-- Menu for choosing the desired type of grid;
-- Highlighting numbers corresponding to the current control;
-- Rerolling grids automatically when it's unsolvable;
 - Injecting a random seed;
+- Highlighting numbers corresponding to the current control;
 - Variable size grid;
 - Generating grids by difficulty;
 

@@ -14,10 +14,15 @@ export class GridGenerator {
 	 * @param grid Initial grid to base the solution
 	 * @returns Grid meant to be solved
 	 */
-	generate(grid: Grid): Grid {
+	generate(grid: Grid): [boolean, Grid] {
 		this.iteration = 0;
 
-		const solution = this.solve(grid.clone());
+		const [canSolve, solution] = this.solve(grid.clone());
+
+		if (!canSolve) {
+			return [canSolve, solution];
+		}
+
 		const cells = solution.cells;
 		for (let i = 0; i < cells.length; i++) {
 			const cell = cells[i]!;
@@ -28,7 +33,7 @@ export class GridGenerator {
 			}
 		}
 
-		return solution;
+		return [canSolve, solution];
 	}
 
 	/**
@@ -37,10 +42,10 @@ export class GridGenerator {
 	 * @param grid Grid to modify to contain the solution
 	 * @returns the solved grid
 	 */
-	private solve(grid: Grid): Grid {
+	private solve(grid: Grid): [boolean, Grid] {
 		const cells = grid.cells;
-		this.innerSolve(cells, grid.cells.length - 1);
-		return grid;
+		const canSolve = this.innerSolve(cells, grid.cells.length - 1);
+		return [canSolve, grid];
 	}
 
 	/**

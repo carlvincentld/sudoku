@@ -13,7 +13,7 @@ td {
 	width: 2em;
 	height: 2em;
 
-	box-sizing: content-box;
+	box-sizing: border-box;
 	opacity: 0.5;
 
 	text-align: center;

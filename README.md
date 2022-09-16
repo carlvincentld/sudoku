@@ -7,9 +7,12 @@ Features includes:
 - 9x9 grid generation;
 - Pencil markings;
 - Grid validation;
+- Undo & redo;
+- Shortcuts (grid or controls must be focussed);
 
 Planned features:
-- Better controls (undo, redo, fill every markings, shortcuts);
+- Better controls (fill every markings);
+- Dynamic font-size;
 - Injecting a random seed;
 - Highlighting numbers corresponding to the current control;
 - Variable size grid;

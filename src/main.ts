@@ -11,6 +11,7 @@ function sync(): Promise<void> {
 
 function main() {
 	const game = document.getElementById('game')!;
+	createGame('classical', game);
 
 	const newClassical = document.getElementById('new-game-classical')!;
 	newClassical.addEventListener('click', () => setTimeout(() => createGame('classical', game), 0));

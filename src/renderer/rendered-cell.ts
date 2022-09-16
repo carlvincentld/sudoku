@@ -1,6 +1,11 @@
 import { Cell } from "../grid/cell";
 import { CellCollection } from "../grid/cell-collection";
 import { Grid } from "../grid/grid";
+import { CompositeAction } from "./actions/composite-action";
+import { MarkingAddAction, RemoveMarkingAction as MarkingRemoveAction } from "./actions/markings-action";
+import { PenEraseAction, PenWriteAction } from "./actions/pen-action";
+import { Operations } from "./operations";
+import { RenderedControls } from "./rendered-controls";
 
 export class RenderedCell {
 	readonly el: HTMLTableCellElement;
@@ -16,10 +21,8 @@ export class RenderedCell {
 	constructor(
 		cell: Cell,
 		grid: Grid,
-		private _control: {
-			selectedNumber: () => number,
-			isPencilMarking: () => boolean
-		}
+		private _operations: Operations,
+		private _control: RenderedControls
 	) {
 		this.column = cell.column;
 		this.row = cell.row;
@@ -58,44 +61,18 @@ export class RenderedCell {
 		this._onValueChanged.push(fn);
 	}
 
-	private onValueChanged(): void {
-		this._onValueChanged.forEach(fn => fn(this));
-	}
-
-	private onClick(): void {
-		const number = this._control.selectedNumber();
-		const isMarking = this._control.isPencilMarking();
-
-		if (isMarking) {
-			if (this.value !== null) {
-				this.el.innerHTML = ``;
-				this.value = null;
-
-				this.onValueChanged();
-			}
-
-			this.toggleMarking(number);
+	removeMaking(number: number): void {
+		if (!this._markings.has(number)) {
 			return;
 		}
 
-		if (this.value === number) {
-			this.value = null;
-			this.el.innerHTML = ``;
-		} else {
-			this.value = number;
-			this.el.innerHTML = `${number}`;
-
-			this._markings.clear();
-		}
-
-		this.onValueChanged();
+		const marking = this._markings.get(number)!;
+		this.el.removeChild(marking);
+		this._markings.delete(number);
 	}
 
-	private toggleMarking(number: number): void {
+	addMarking(number: number): void {
 		if (this._markings.has(number)) {
-			const marking = this._markings.get(number)!;
-			this.el.removeChild(marking);
-			this._markings.delete(number);
 			return;
 		}
 
@@ -107,5 +84,50 @@ export class RenderedCell {
 		this.el.appendChild(marking);
 
 		this._markings.set(number, marking);
+	}
+
+	writeValue(number: number | null): void {
+		this.value = number;
+		this.el.innerHTML = this.value === null
+			? ''
+			: `${number}`;
+
+		this.onValueChanged();
+	}
+
+	private onValueChanged(): void {
+		this._onValueChanged.forEach(fn => fn(this));
+	}
+
+	private onClick(): void {
+		const number = this._control.selectedNumber;
+		const isMarking = this._control.isPencilMarking();
+
+		if (!isMarking) {
+			if (this.value === number) {
+				this._operations.do(new PenEraseAction(this, this.value));
+			} else {
+				this._operations.do(
+					new CompositeAction(
+						new MarkingRemoveAction(this, Array.from(this._markings.keys())),
+						new PenWriteAction(this, number, this.value)
+					));
+				this._markings.clear();
+			}
+		} else if (this.value !== null) {
+			this._operations.do(
+				new CompositeAction(
+					new PenEraseAction(this, this.value),
+					new MarkingAddAction(this, [number])
+				));
+		} else if (this._markings.has(number)) {
+			this._operations.do(
+				new MarkingRemoveAction(this, [number])
+			)
+		} else {
+			this._operations.do(
+				new MarkingAddAction(this, [number])
+			);
+		}
 	}
 }

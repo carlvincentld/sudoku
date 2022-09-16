@@ -49,12 +49,12 @@ td > input {
 
 /* Controls */
 .controls {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
+	display: grid;
+	grid-template-columns: repeat(10, 1fr);
+	gap: 0.25em;
 }
 
-.controls input[type="radio"], 
+.controls input[type="radio"],
 .controls button {
 	position: relative;
 
@@ -70,38 +70,47 @@ td > input {
 	--button-width: 2.5rem;
 	font-size: 1.25rem;
 
-	width:  var(--button-width);
-	height: var(--button-width);
+	flex: 1 1 10%;
+	aspect-ratio: 1 / 1;
 
 	margin: 0;
-	padding: 2px;
+	padding: 0;
 
 	box-sizing: border-box;
 
 	background-color: #e0e0e0;
 }
 
-.controls button::after {
-	content: "\270E";
-	font-family: monospace;
-}
-
-.controls.pencil-marking button,
+.controls.pencil-marking .pencil,
 .controls input[type="radio"]:checked {
 	background-color: #c0c0c0;
 	box-shadow: rgba(0, 255, 255, 1) 0 0 5px;
 }
 
+.controls button::after,
+.controls input[type="radio"]::after {
+	font-family: monospace;
+	position: absolute;
+}
+
+.controls .pencil::after {
+	content: "\270E";
+}
+
+.controls .undo::after {
+	content: "\293A";
+}
+
+.controls .redo::after {
+	content: "\293A";
+	transform: rotateY(180deg);
+}
+
 .controls input[type="radio"]::after {
 	content: attr(value);
-	font-family: monospace;
 }
 
-td {
-	position: relative;
-	--button-width: 2em;
-}
-
+/* Markings */
 .controls.pencil-marking input[type="radio"]::after,
 td span {
 	position: absolute;
@@ -113,11 +122,11 @@ td span {
 
 
 	top: calc(
-		var(--pos-y) / var(--max-y) * 100% 
+		var(--pos-y) / var(--max-y) * 100%
 		+ var(--padding-top)
 		- var(--font-size) * var(--pos-y) / var(--max-y));
 	left: calc(
-		var(--pos-x) / var(--max-x) * 100% 
+		var(--pos-x) / var(--max-x) * 100%
 		+ var(--padding-left));
 	font-size: var(--font-size);
 	font-weight: bold;
@@ -127,6 +136,11 @@ td span {
 .invalid-row,
 .invalid-column,
 .invalid-section {
-	box-shadow: 
+	box-shadow:
 		0 0 0.25em red inset;
+}
+
+td {
+	position: relative;
+	--button-width: 2em;
 }

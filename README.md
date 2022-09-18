@@ -11,10 +11,9 @@ Features includes:
 - Shortcuts (grid or controls must be focussed);
 
 Planned features:
-- Better controls (fill every markings);
-- Dynamic font-size;
 - Injecting a random seed;
 - Highlighting numbers corresponding to the current control;
+- New interface (responsive, better menus);
 - Variable size grid;
 - Generating grids by difficulty;
 

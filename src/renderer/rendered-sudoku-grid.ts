@@ -1,6 +1,7 @@
 import { CellCollection } from "../grid/cell-collection";
 import { Grid } from "../grid/grid";
 import { groupBy } from "../helpers/array.helper";
+import { CompositeAction } from "./actions/composite-action";
 import { Operations } from "./operations";
 import { RenderedCell } from "./rendered-cell";
 import { RenderedControls } from "./rendered-controls";
@@ -19,7 +20,13 @@ export class RenderedSudokuGrid {
 		this._operations = new Operations();
 		this._renderedCells = new Array<RenderedCell>();
 
-		const controls = new RenderedControls(grid, this._operations);
+		const controls = new RenderedControls(grid, this._operations, () => {
+			this._operations.do(
+				new CompositeAction(
+					...this._renderedCells.map(x => x.fillMarkingsAction())
+				)
+			);
+		});
 		const table = this.createTable(grid, controls);
 
 		this._cellsByColumn = groupBy(this._renderedCells, (x) => x.column);

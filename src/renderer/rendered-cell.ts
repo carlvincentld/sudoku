@@ -1,11 +1,14 @@
 import { Cell } from "../grid/cell";
 import { CellCollection } from "../grid/cell-collection";
 import { Grid } from "../grid/grid";
+import { Action } from "./actions/action";
 import { CompositeAction } from "./actions/composite-action";
+import { DoNothingAction } from "./actions/do-nothing-action";
 import { MarkingAddAction, RemoveMarkingAction as MarkingRemoveAction } from "./actions/markings-action";
 import { PenEraseAction, PenWriteAction } from "./actions/pen-action";
 import { Operations } from "./operations";
 import { RenderedControls } from "./rendered-controls";
+import { SVGGenerator } from "./svg-generator";
 
 export class RenderedCell {
 	readonly el: HTMLTableCellElement;
@@ -15,12 +18,16 @@ export class RenderedCell {
 	readonly section: CellCollection;
 
 	value: number | null;
-	private _markings: Map<number, HTMLElement>;
+
+	private _isConstant: boolean;
+	private _markings: Map<number, SVGTextElement>;
 	private _onValueChanged: Array<(cell: RenderedCell) => void>;
+	private _svgGenerator = new SVGGenerator();
+	private _svg: SVGElement;
 
 	constructor(
 		cell: Cell,
-		grid: Grid,
+		private _grid: Grid,
 		private _operations: Operations,
 		private _control: RenderedControls
 	) {
@@ -29,28 +36,31 @@ export class RenderedCell {
 		this.section = cell.section;
 
 		this.value = cell.value;
-		this._markings = new Map<number, HTMLElement>();
+		this._markings = new Map<number, SVGTextElement>();
 		this._onValueChanged = [];
 
 		this.el = document.createElement('td');
+		this._svg = this._svgGenerator.createSVG();
+		this.el.appendChild(this._svg);
 
 		this.el.setAttribute('section', `${cell.section.ord}`);
-		if (grid.cellsByPosition.get(cell.position(+1, 0))?.section !== cell.section) {
+		if (_grid.cellsByPosition.get(cell.position(+1, 0))?.section !== cell.section) {
 			this.el.classList.add('section-edge-top');
 		}
-		if (grid.cellsByPosition.get(cell.position(-1, 0))?.section !== cell.section) {
+		if (_grid.cellsByPosition.get(cell.position(-1, 0))?.section !== cell.section) {
 			this.el.classList.add('section-edge-bottom');
 		}
-		if (grid.cellsByPosition.get(cell.position(0, +1))?.section !== cell.section) {
+		if (_grid.cellsByPosition.get(cell.position(0, +1))?.section !== cell.section) {
 			this.el.classList.add('section-edge-left');
 		}
-		if (grid.cellsByPosition.get(cell.position(0, -1))?.section !== cell.section) {
+		if (_grid.cellsByPosition.get(cell.position(0, -1))?.section !== cell.section) {
 			this.el.classList.add('section-edge-right');
 		}
 
-		if (cell.value !== null) {
+		if (this._isConstant = cell.value !== null) {
 			this.el.classList.add('constant');
-			this.el.textContent = `${cell.value}`;
+			const marking = this._svgGenerator.createPenMarking(cell.value, true);
+			this._svg.appendChild(marking);
 			return;
 		}
 
@@ -67,7 +77,8 @@ export class RenderedCell {
 		}
 
 		const marking = this._markings.get(number)!;
-		this.el.removeChild(marking);
+
+		this._svg.removeChild(marking);
 		this._markings.delete(number);
 	}
 
@@ -76,23 +87,33 @@ export class RenderedCell {
 			return;
 		}
 
-		const marking = document.createElement('span');
-		marking.style.setProperty('--pos-x', `${(number - 1) % 3}`);
-		marking.style.setProperty('--pos-y', `${Math.floor((number - 1) / 3)}`);
+		const marking = this._svgGenerator.createPencilMarking(number, 3, 3);
 
-		marking.textContent = `${number}`;
-		this.el.appendChild(marking);
-
+		this._svg.appendChild(marking);
 		this._markings.set(number, marking);
 	}
 
 	writeValue(number: number | null): void {
 		this.value = number;
-		this.el.innerHTML = this.value === null
-			? ''
-			: `${number}`;
+		
+		if (number === null) {
+			this._svg.childNodes.forEach(x => this._svg.removeChild(x));
+		} else {
+			this._svg.appendChild(this._svgGenerator.createPenMarking(number));
+		}
 
 		this.onValueChanged();
+	}
+
+	fillMarkingsAction(): Action {
+		if (this._isConstant) {
+			return DoNothingAction.Instance;
+		}
+
+		return new MarkingAddAction(
+			this,
+			this._grid.validValues().filter(x => !this._markings.has(x))
+		);
 	}
 
 	private onValueChanged(): void {

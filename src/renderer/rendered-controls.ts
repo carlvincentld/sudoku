@@ -1,5 +1,6 @@
 import { Grid } from "../grid/grid";
 import { Operations } from "./operations";
+import { SVGGenerator } from "./svg-generator";
 
 export class RenderedControls {
     readonly el: HTMLElement;
@@ -9,29 +10,23 @@ export class RenderedControls {
     }
 
     set selectedNumber(value: number) {
-        this._numbers[value - 1]!.checked = true;
+        this._numbers[this._selectedNumber - 1]!.classList.remove('active');
         this._selectedNumber = value;
+        this._numbers[this._selectedNumber - 1]!.classList.add('active');
     }
 
     private _selectedNumber = 1;
     private _isPencilMarking = true;
 
-    private _numbers = new Array<HTMLInputElement>();
+    private _numbers = new Array<HTMLButtonElement>();
+    private _svgGenerator = new SVGGenerator();
 
-    constructor(grid: Grid, operations: Operations) {
+    constructor(grid: Grid, operations: Operations, onFillMarkings: () => void) {
         const controls = document.createElement('div');
         controls.classList.add('controls');
-        controls.classList.add('pencil-marking');
+        controls.classList.add('pencil-mode');
 
-        const pencil = document.createElement('button');
-        pencil.classList.add('pencil');
-        pencil.title = "Toggle between pen and pencil (shortcut: space)"
-        pencil.addEventListener(
-            'click',
-            () => {
-                this.togglePencilMarking();
-            }
-        );
+        const pencil = this.createPencil();
 
         controls.appendChild(pencil);
 
@@ -42,24 +37,8 @@ export class RenderedControls {
             controls.appendChild(number);
         }
 
-        const undo = document.createElement('button');
-        undo.title = `Undoes the previous action (shortcut: CTRL+Z)`;
-        undo.classList.add('undo');
-        undo.disabled = true;
-        undo.addEventListener(
-            'click',
-            () => { operations.undo(); }
-        );
-
-        const redo = document.createElement('button');
-        undo.title = `Redoes the previous undone action (shortcut: CTRL+Y)`;
-        redo.classList.add('redo');
-        redo.disabled = true;
-        redo.addEventListener(
-            'click',
-            () => { operations.redo(); }
-        );
-
+        const undo = this.createUndoButton(operations);
+        const redo = this.createRedoButton(operations);
         operations.registerOnActionCompleted(() => {
             undo.disabled = !operations.canUndo();
             redo.disabled = !operations.canRedo();
@@ -67,6 +46,10 @@ export class RenderedControls {
 
         controls.appendChild(undo);
         controls.appendChild(redo);
+
+        const fillMarkings = this.createFillMarkings();
+        fillMarkings.addEventListener('click', onFillMarkings);
+        controls.append(fillMarkings);
 
         this.el = controls;
     }
@@ -77,25 +60,105 @@ export class RenderedControls {
 
     togglePencilMarking() {
         this._isPencilMarking = !this._isPencilMarking;
-        this.el.classList.toggle('pencil-marking', this._isPencilMarking);
+        this.el.classList.toggle('pencil-mode', this._isPencilMarking);
+        this.el.classList.toggle('pen-mode', !this._isPencilMarking);
     }
 
-    private createNumber(value: number): HTMLInputElement {
-        const number = document.createElement('input');
-        number.type = 'radio';
-        number.name = 'value';
-        number.value = `${value}`;
-        number.checked = value === 1;
-        number.style.setProperty('--pos-x', `${(value - 1) % 3}`);
-        number.style.setProperty('--pos-y', `${Math.floor((value - 1) / 3)}`);
+    private createNumber(value: number): HTMLButtonElement {
+        const button = document.createElement('button');
+        // TODO: Support letters for numbers greater than 9
+        button.title = `Select ${value} (shortcut: ${value})`;
+        button.classList.add('pencil-dependent');
 
-        number.addEventListener(
-            'change',
+        if (value === this._selectedNumber) {
+            button.classList.add('active');
+        }
+
+        const svg = this._svgGenerator.createSVG();
+        svg.appendChild(this._svgGenerator.createPenMarking(value));
+        svg.appendChild(this._svgGenerator.createPencilMarking(value, 3, 3));
+
+        button.appendChild(svg);
+        button.addEventListener(
+            'click', 
             () => {
-                this._selectedNumber = value;
+                this.selectedNumber = value;
+            });
+
+        return button;
+    }
+
+    private createPencil() {
+        const pencil = document.createElement('button');
+        pencil.classList.add('pencil');
+        pencil.title = "Toggle between pen and pencil (shortcut: space)";
+
+        pencil.addEventListener(
+            'click',
+            () => {
+                this.togglePencilMarking();
             }
         );
 
-        return number;
+        const svg = this._svgGenerator.createSVG();
+        svg.appendChild(this._svgGenerator.createCustomText('&#x270E'));
+        pencil.appendChild(svg);
+
+        return pencil;
+    }
+
+    private createUndoButton(operations: Operations) {
+        const undo = document.createElement('button');
+        undo.title = `Undo (shortcut: CTRL+Z)`;
+        undo.classList.add('undo');
+
+        undo.disabled = true;
+        undo.addEventListener(
+            'click',
+            () => { operations.undo(); }
+        );
+
+        const svg = this._svgGenerator.createSVG();
+        svg.appendChild(this._svgGenerator.createCustomText('&#x293A'));
+        undo.appendChild(svg);
+
+        return undo;
+    }
+
+    private createRedoButton(operations: Operations) {
+        const redo = document.createElement('button');
+        redo.title = `Redo (shortcut: CTRL+Y)`;
+        redo.classList.add('redo');
+
+        redo.disabled = true;
+        redo.addEventListener(
+            'click',
+            () => { operations.redo(); }
+        );
+
+        const svg = this._svgGenerator.createSVG();
+        const text = this._svgGenerator.createCustomText('&#x293A');
+        text.setAttribute('transform-origin', 'center');
+        text.setAttribute('transform', 'scale(-1, 1)');
+        svg.appendChild(text);
+        redo.appendChild(svg);
+
+        return redo;
+    }
+
+
+    private createFillMarkings(): HTMLButtonElement {
+        const button = document.createElement('button');
+        button.title = `Fill all markings`;
+        button.classList.add('pencil-independent');
+
+        const svg = this._svgGenerator.createSVG();
+        for (let i = 0; i < 9; i++) {
+            svg.appendChild(this._svgGenerator.createPencilMarking(i + 1, 3, 3));
+        }
+
+        button.appendChild(svg);
+
+        return button;
     }
 }

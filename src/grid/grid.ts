@@ -105,5 +105,9 @@ export class Grid {
 		}
 		return result;
 	}
+
+	validValues(): number[] {
+		return range(1, this.MAX_VALUE + 1);
+	}
 }
 

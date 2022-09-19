@@ -1,4 +1,6 @@
 {
+	"name": "sudoku",
+	"version": "0.0.1",
 	"private": true,
 	"scripts": {
 		"prestart": "webpack --config webpack.config.prod.js",
@@ -8,7 +10,9 @@
 		"watch:build": "webpack -w --config webpack.config.dev.js",
 		"watch:serve": "node server.js",
 
-		"build": "webpack --config webpack.config.prod.js"
+		"build": "webpack --config webpack.config.prod.js",
+
+		"prepack": "webpack --config webpack.config.prod.js"
 	},
 	"devDependencies": {
 		"mocha": "^7.0.0",

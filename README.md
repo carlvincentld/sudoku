@@ -17,6 +17,8 @@ Planned features:
 - Variable size grid;
 - Generating grids by difficulty;
 
+A demo version of v0.0.1 is available at [carlvincentld.github.io/sudoku/](https://carlvincentld.github.io/sudoku/).
+
 # Installation
 
 ```bash

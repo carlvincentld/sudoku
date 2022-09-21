@@ -5,13 +5,10 @@
 	"scripts": {
 		"prestart": "webpack --config webpack.config.prod.js",
 		"start": "node server.js",
-
 		"dev": "npm-run-all --race --parallel watch:*",
 		"watch:build": "webpack -w --config webpack.config.dev.js",
 		"watch:serve": "node server.js",
-
 		"build": "webpack --config webpack.config.prod.js",
-
 		"prepack": "webpack --config webpack.config.prod.js"
 	},
 	"devDependencies": {

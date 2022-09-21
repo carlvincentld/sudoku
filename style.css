@@ -6,7 +6,8 @@
 }
 
 /* Grid */
-table, .controls {
+table,
+.controls {
 	margin: 2em;
 }
 
@@ -22,10 +23,18 @@ td {
 	border: 1px solid black;
 }
 
-td.section-edge-top { border-top-width: 3px; }
-td.section-edge-bottom { border-bottom-width: 3px; }
-td.section-edge-left { border-left-width: 3px; }
-td.section-edge-right { border-right-width: 3px; }
+td.section-edge-top {
+	border-top-width: 3px;
+}
+td.section-edge-bottom {
+	border-bottom-width: 3px;
+}
+td.section-edge-left {
+	border-left-width: 3px;
+}
+td.section-edge-right {
+	border-right-width: 3px;
+}
 
 td {
 	color: rgba(0, 0, 255, 0.75);
@@ -35,7 +44,7 @@ td.constant {
 	color: rgba(0, 0, 0, 1);
 }
 
-td>* {
+td > * {
 	vertical-align: middle;
 }
 
@@ -58,7 +67,7 @@ td>* {
 }
 
 .controls button::after,
-.controls input[type="radio"]::after {
+.controls input[type='radio']::after {
 	font-family: monospace;
 	position: absolute;
 }

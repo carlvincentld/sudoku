@@ -23,8 +23,7 @@ const mimeTypes = {
 };
 
 function getContentType(filePath) {
-	const extname = String(path.extname(filePath))
-		.toLowerCase();
+	const extname = String(path.extname(filePath)).toLowerCase();
 	return mimeTypes[extname] ?? 'application/octet-stream';
 }
 

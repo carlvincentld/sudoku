@@ -3,6 +3,7 @@
 A vanilla TypeScript implementation of a Sudoku grid, including a generator for a classical 9x9 grid.
 
 Features includes:
+
 - Classical & jigsaw grid generator;
 - 9x9 grid generation;
 - Pencil markings;
@@ -12,6 +13,7 @@ Features includes:
 - Choosing a random seed;
 
 Planned features:
+
 - Highlighting numbers corresponding to the current control;
 - New interface (responsive, better menus);
 - Variable size grid;

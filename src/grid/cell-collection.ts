@@ -31,7 +31,7 @@ class RangeSet<Minimum extends number, Maximum extends number> {
 	private _maximum: number;
 	private _set: Array<number | null>;
 
-	constructor(reference: RangeSet<Minimum, Maximum>);	
+	constructor(reference: RangeSet<Minimum, Maximum>);
 	constructor(minimum: Minimum, maximum: Maximum);
 	constructor(
 		minimum: Minimum | RangeSet<Minimum, Maximum>,
@@ -60,9 +60,8 @@ class RangeSet<Minimum extends number, Maximum extends number> {
 		const result = new RangeSet(this);
 
 		for (let i = 0; i < result._set.length; i++) {
-			result._set[i] = result._set[i] === other._set[i]
-				? result._set[i] as number
-				: null;
+			result._set[i] =
+				result._set[i] === other._set[i] ? (result._set[i] as number) : null;
 		}
 
 		return result;

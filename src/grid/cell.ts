@@ -15,10 +15,7 @@ export class Cell {
 	}
 
 	availableValues(): number[] {
-		return this.section.intersect(
-			this.column,
-			this.row
-		);
+		return this.section.intersect(this.column, this.row);
 	}
 
 	setValue(value: number): void {

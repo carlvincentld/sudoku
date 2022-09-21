@@ -4,9 +4,7 @@ export function range(start: number, end?: number): number[] {
 		start = 0;
 	}
 
-	return new Array(end - start)
-		.fill(0)
-		.map((_, i) => i + start);
+	return new Array(end - start).fill(0).map((_, i) => i + start);
 }
 
 export function unique<T>(array: Array<T>): Array<T> {
@@ -22,34 +20,34 @@ export function zip<A, B>(a: Array<A>, b: Array<B>): Array<[A, B]> {
 	return result;
 }
 
-export function groupBy<T, K>(iterable: Iterable<T>, keyFunc: (value: T, index: number) => K): Map<K, T[]> {
+export function groupBy<T, K>(
+	iterable: Iterable<T>,
+	keyFunc: (value: T, index: number) => K
+): Map<K, T[]> {
 	const array = Array.from(iterable);
-	return array.reduce(
-		(acc, current, index) => {
-			const key = keyFunc(current, index);
-			if (acc.has(key)) {
-				acc.get(key)!.push(current);
-			} else {
-				acc.set(key, [current]);
-			}
-			return acc;
-		},
-		new Map<K, T[]>()
-	);
+	return array.reduce((acc, current, index) => {
+		const key = keyFunc(current, index);
+		if (acc.has(key)) {
+			acc.get(key)!.push(current);
+		} else {
+			acc.set(key, [current]);
+		}
+		return acc;
+	}, new Map<K, T[]>());
 }
 
-export function groupBySet<T, K>(iterable: Iterable<T>, keyFunc: (value: T, index: number) => K): Map<K, Set<T>> {
+export function groupBySet<T, K>(
+	iterable: Iterable<T>,
+	keyFunc: (value: T, index: number) => K
+): Map<K, Set<T>> {
 	const array = Array.from(iterable);
-	return array.reduce(
-		(acc, current, index) => {
-			const key = keyFunc(current, index);
-			if (acc.has(key)) {
-				acc.get(key)!.add(current);
-			} else {
-				acc.set(key, new Set([current]));
-			}
-			return acc;
-		},
-		new Map<K, Set<T>>()
-	);
+	return array.reduce((acc, current, index) => {
+		const key = keyFunc(current, index);
+		if (acc.has(key)) {
+			acc.get(key)!.add(current);
+		} else {
+			acc.set(key, new Set([current]));
+		}
+		return acc;
+	}, new Map<K, Set<T>>());
 }

@@ -1,13 +1,11 @@
 import { Grid } from './grid';
 import { Cell } from './cell';
-import { RandomFunc, shuffle } from "../helpers/random.helper";
+import { RandomFunc, shuffle } from '../helpers/random.helper';
 
 const ITERATION_LIMIT = 100_000;
 
 export class GridGenerator {
-	constructor(private _random: RandomFunc) {
-	}
-
+	constructor(private _random: RandomFunc) {}
 
 	iteration: number = 0;
 
@@ -97,7 +95,11 @@ export class GridGenerator {
 	 * @param selectedValue Value to skip during the validity check
 	 * @returns true if there exists a solution for the given grid or the iteration limit has been achieved
 	 */
-	private canSolveOtherWay(cells: Cell[], index: number, selectedValue: number): boolean {
+	private canSolveOtherWay(
+		cells: Cell[],
+		index: number,
+		selectedValue: number
+	): boolean {
 		const cell = cells[index]!;
 
 		const values = cell.availableValues();

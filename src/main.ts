@@ -14,48 +14,48 @@ function sync(): Promise<void> {
 function generateSeed(): string {
 	const hexCharacters = '0123456789ABCDEF';
 	return range(16)
-		.map(() => hexCharacters.charAt(Math.floor(Math.random() * hexCharacters.length)))
+		.map(() =>
+			hexCharacters.charAt(Math.floor(Math.random() * hexCharacters.length))
+		)
 		.join('');
 }
 
 function main() {
 	const seedElement = document.getElementById('seed') as HTMLInputElement;
 
-	let seed = seedElement.value = generateSeed();
+	let seed = (seedElement.value = generateSeed());
 
 	const game = document.getElementById('game')!;
 	createGame('classical', game, seed);
 
 	const newClassical = document.getElementById('new-game-classical')!;
-	newClassical.addEventListener(
-		'click',
-		() => setTimeout(
-			() => {
-				seed = seedElement.value === seed
-					? generateSeed()
-					: seedElement.value;
+	newClassical.addEventListener('click', () =>
+		setTimeout(() => {
+			seed = seedElement.value === seed ? generateSeed() : seedElement.value;
 
-				seedElement.value = seed;
+			seedElement.value = seed;
 
-				createGame('classical', game, seed);
-			}, 0));
+			createGame('classical', game, seed);
+		}, 0)
+	);
 
 	const newJigsaw = document.getElementById('new-game-jigsaw')!;
-	newJigsaw.addEventListener(
-		'click',
-		() => setTimeout(
-			() => {
-				seed = seedElement.value === seed
-					? generateSeed()
-					: seedElement.value;
+	newJigsaw.addEventListener('click', () =>
+		setTimeout(() => {
+			seed = seedElement.value === seed ? generateSeed() : seedElement.value;
 
-				seedElement.value = seed;
+			seedElement.value = seed;
 
-				createGame('jigsaw', game, seed);
-			}, 0));
+			createGame('jigsaw', game, seed);
+		}, 0)
+	);
 }
 
-async function createGame(gameType: 'jigsaw' | 'classical', container: HTMLElement, seed?: string): Promise<void> {
+async function createGame(
+	gameType: 'jigsaw' | 'classical',
+	container: HTMLElement,
+	seed?: string
+): Promise<void> {
 	const width = 9;
 	const height = 9;
 	const sectionCount = 9;
@@ -63,13 +63,14 @@ async function createGame(gameType: 'jigsaw' | 'classical', container: HTMLEleme
 	const random = seed ? xoshiro128ss(...cyrb128(seed)) : Math.random;
 
 	for (let i = 1; i <= MAX_TRY; i++) {
-		container.innerHTML = `Trying to generate a grid: ${i} of ${MAX_TRY} tries;`
+		container.innerHTML = `Trying to generate a grid: ${i} of ${MAX_TRY} tries;`;
 
 		await sync();
 
-		const grid = gameType === 'jigsaw'
-			? new JigsawGrid(width, height, sectionCount, random)
-			: new Grid(width, height, sectionCount);
+		const grid =
+			gameType === 'jigsaw'
+				? new JigsawGrid(width, height, sectionCount, random)
+				: new Grid(width, height, sectionCount);
 		const generator = new GridGenerator(random);
 		const [canSolve, generated] = generator.generate(grid);
 
@@ -86,7 +87,6 @@ async function createGame(gameType: 'jigsaw' | 'classical', container: HTMLEleme
 
 	container.innerHTML = `Failed to generate a ${gameType} grid after ${MAX_TRY} tries;`;
 }
-
 
 if (document.readyState === 'loading') {
 	document.addEventListener('DOMContentLoaded', main);

@@ -1,10 +1,10 @@
-import { CellCollection } from "../grid/cell-collection";
-import { Grid } from "../grid/grid";
-import { groupBy } from "../helpers/array.helper";
-import { CompositeAction } from "./actions/composite-action";
-import { Operations } from "./operations";
-import { RenderedCell } from "./rendered-cell";
-import { RenderedControls } from "./rendered-controls";
+import { CellCollection } from '../grid/cell-collection';
+import { Grid } from '../grid/grid';
+import { groupBy } from '../helpers/array.helper';
+import { CompositeAction } from './actions/composite-action';
+import { Operations } from './operations';
+import { RenderedCell } from './rendered-cell';
+import { RenderedControls } from './rendered-controls';
 
 export class RenderedSudokuGrid {
 	readonly el: HTMLElement;
@@ -23,7 +23,7 @@ export class RenderedSudokuGrid {
 		const controls = new RenderedControls(grid, this._operations, () => {
 			this._operations.do(
 				new CompositeAction(
-					...this._renderedCells.map(x => x.fillMarkingsAction())
+					...this._renderedCells.map((x) => x.fillMarkingsAction())
 				)
 			);
 		});
@@ -42,37 +42,35 @@ export class RenderedSudokuGrid {
 		wrapper.appendChild(table);
 		wrapper.appendChild(controls.el);
 
-		wrapper.addEventListener(
-			'keydown',
-			(e) => {
-				if (e.repeat) {
-					return;
-				}
+		wrapper.addEventListener('keydown', (e) => {
+			if (e.repeat) {
+				return;
+			}
 
-				if (1 <= +e.key && +e.key <= grid.MAX_VALUE) {
-					controls.selectedNumber = +e.key;
-					e.preventDefault();
-				} else if (e.key === " ") {
-					controls.togglePencilMarking();
-					e.preventDefault();
-				} else if (e.key === "z" && e.ctrlKey) {
-					// TODO: Add a warning to tell the user can't undo
-					if (this._operations.canUndo())  {
-						this._operations.undo();
-					}
-				} else if (e.key === "y" && e.ctrlKey) {
-					// TODO: Add a warning to tell the user can't redo
-					if (this._operations.canRedo())  {
-						this._operations.redo();
-					}
+			if (1 <= +e.key && +e.key <= grid.MAX_VALUE) {
+				controls.selectedNumber = +e.key;
+				e.preventDefault();
+			} else if (e.key === ' ') {
+				controls.togglePencilMarking();
+				e.preventDefault();
+			} else if (e.key === 'z' && e.ctrlKey) {
+				// TODO: Add a warning to tell the user can't undo
+				if (this._operations.canUndo()) {
+					this._operations.undo();
 				}
-			});
+			} else if (e.key === 'y' && e.ctrlKey) {
+				// TODO: Add a warning to tell the user can't redo
+				if (this._operations.canRedo()) {
+					this._operations.redo();
+				}
+			}
+		});
 
 		this.el = wrapper;
 	}
 
 	private createTable(grid: Grid, control: RenderedControls): HTMLTableElement {
-		const cells = new Map(grid.cells.map(c => [`${c.y},${c.x}`, c]));
+		const cells = new Map(grid.cells.map((c) => [`${c.y},${c.x}`, c]));
 
 		const table = document.createElement('table');
 		for (let y = 0; y < grid.HEIGHT; y++) {
@@ -80,8 +78,13 @@ export class RenderedSudokuGrid {
 			table.appendChild(tr);
 
 			for (let x = 0; x < grid.WIDTH; x++) {
-				const cell = cells.get(`${y},${x}`)!
-				const renderedCell = new RenderedCell(cell, grid, this._operations, control);
+				const cell = cells.get(`${y},${x}`)!;
+				const renderedCell = new RenderedCell(
+					cell,
+					grid,
+					this._operations,
+					control
+				);
 
 				renderedCell.registerOnValueChanged(this.refreshValidation.bind(this));
 				this._renderedCells.push(renderedCell);
@@ -98,16 +101,21 @@ export class RenderedSudokuGrid {
 		this.validateUniqueness(this._cellsBySection.get(cell.section)!, 'section');
 	}
 
-	private validateUniqueness(cells: RenderedCell[], collection: 'row' | 'column' | 'section'): void {
+	private validateUniqueness(
+		cells: RenderedCell[],
+		collection: 'row' | 'column' | 'section'
+	): void {
 		const cellsByValue = groupBy(cells, (x) => x.value);
 
 		cellsByValue.forEach((grouping, value) => {
 			if (value !== null && grouping.length > 1) {
-				grouping.map(x => x.el)
-					.forEach(x => x.classList.add(`invalid-${collection}`));
+				grouping
+					.map((x) => x.el)
+					.forEach((x) => x.classList.add(`invalid-${collection}`));
 			} else {
-				grouping.map(x => x.el)
-					.forEach(x => x.classList.remove(`invalid-${collection}`));
+				grouping
+					.map((x) => x.el)
+					.forEach((x) => x.classList.remove(`invalid-${collection}`));
 			}
 		});
 	}

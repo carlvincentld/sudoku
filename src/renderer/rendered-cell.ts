@@ -1,14 +1,17 @@
-import { Cell } from "../grid/cell";
-import { CellCollection } from "../grid/cell-collection";
-import { Grid } from "../grid/grid";
-import { Action } from "./actions/action";
-import { CompositeAction } from "./actions/composite-action";
-import { DoNothingAction } from "./actions/do-nothing-action";
-import { MarkingAddAction, RemoveMarkingAction as MarkingRemoveAction } from "./actions/markings-action";
-import { PenEraseAction, PenWriteAction } from "./actions/pen-action";
-import { Operations } from "./operations";
-import { RenderedControls } from "./rendered-controls";
-import { SVGGenerator } from "./svg-generator";
+import { Cell } from '../grid/cell';
+import { CellCollection } from '../grid/cell-collection';
+import { Grid } from '../grid/grid';
+import { Action } from './actions/action';
+import { CompositeAction } from './actions/composite-action';
+import { DoNothingAction } from './actions/do-nothing-action';
+import {
+	MarkingAddAction,
+	RemoveMarkingAction as MarkingRemoveAction,
+} from './actions/markings-action';
+import { PenEraseAction, PenWriteAction } from './actions/pen-action';
+import { Operations } from './operations';
+import { RenderedControls } from './rendered-controls';
+import { SVGGenerator } from './svg-generator';
 
 export class RenderedCell {
 	readonly el: HTMLTableCellElement;
@@ -44,20 +47,28 @@ export class RenderedCell {
 		this.el.appendChild(this._svg);
 
 		this.el.setAttribute('section', `${cell.section.ord}`);
-		if (_grid.cellsByPosition.get(cell.position(+1, 0))?.section !== cell.section) {
+		if (
+			_grid.cellsByPosition.get(cell.position(+1, 0))?.section !== cell.section
+		) {
 			this.el.classList.add('section-edge-top');
 		}
-		if (_grid.cellsByPosition.get(cell.position(-1, 0))?.section !== cell.section) {
+		if (
+			_grid.cellsByPosition.get(cell.position(-1, 0))?.section !== cell.section
+		) {
 			this.el.classList.add('section-edge-bottom');
 		}
-		if (_grid.cellsByPosition.get(cell.position(0, +1))?.section !== cell.section) {
+		if (
+			_grid.cellsByPosition.get(cell.position(0, +1))?.section !== cell.section
+		) {
 			this.el.classList.add('section-edge-left');
 		}
-		if (_grid.cellsByPosition.get(cell.position(0, -1))?.section !== cell.section) {
+		if (
+			_grid.cellsByPosition.get(cell.position(0, -1))?.section !== cell.section
+		) {
 			this.el.classList.add('section-edge-right');
 		}
 
-		if (this._isConstant = cell.value !== null) {
+		if ((this._isConstant = cell.value !== null)) {
 			this.el.classList.add('constant');
 			const marking = this._svgGenerator.createPenMarking(cell.value, true);
 			this._svg.appendChild(marking);
@@ -95,9 +106,9 @@ export class RenderedCell {
 
 	writeValue(number: number | null): void {
 		this.value = number;
-		
+
 		if (number === null) {
-			this._svg.childNodes.forEach(x => this._svg.removeChild(x));
+			this._svg.childNodes.forEach((x) => this._svg.removeChild(x));
 		} else {
 			this._svg.appendChild(this._svgGenerator.createPenMarking(number));
 		}
@@ -112,12 +123,12 @@ export class RenderedCell {
 
 		return new MarkingAddAction(
 			this,
-			this._grid.validValues().filter(x => !this._markings.has(x))
+			this._grid.validValues().filter((x) => !this._markings.has(x))
 		);
 	}
 
 	private onValueChanged(): void {
-		this._onValueChanged.forEach(fn => fn(this));
+		this._onValueChanged.forEach((fn) => fn(this));
 	}
 
 	private onClick(): void {
@@ -132,7 +143,8 @@ export class RenderedCell {
 					new CompositeAction(
 						new MarkingRemoveAction(this, Array.from(this._markings.keys())),
 						new PenWriteAction(this, number, this.value)
-					));
+					)
+				);
 				this._markings.clear();
 			}
 		} else if (this.value !== null) {
@@ -140,15 +152,12 @@ export class RenderedCell {
 				new CompositeAction(
 					new PenEraseAction(this, this.value),
 					new MarkingAddAction(this, [number])
-				));
-		} else if (this._markings.has(number)) {
-			this._operations.do(
-				new MarkingRemoveAction(this, [number])
-			)
-		} else {
-			this._operations.do(
-				new MarkingAddAction(this, [number])
+				)
 			);
+		} else if (this._markings.has(number)) {
+			this._operations.do(new MarkingRemoveAction(this, [number]));
+		} else {
+			this._operations.do(new MarkingAddAction(this, [number]));
 		}
 	}
 }

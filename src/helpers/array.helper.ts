@@ -22,15 +22,6 @@ export function zip<A, B>(a: Array<A>, b: Array<B>): Array<[A, B]> {
 	return result;
 }
 
-export function shuffle<T>(array: Iterable<T>): T[] {
-	const result = Array.from(array);
-	for (let i = result.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[result[i], result[j]] = [result[j]!, result[i]!];
-	}
-	return result;
-}
-
 export function groupBy<T, K>(iterable: Iterable<T>, keyFunc: (value: T, index: number) => K): Map<K, T[]> {
 	const array = Array.from(iterable);
 	return array.reduce(

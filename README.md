@@ -9,9 +9,9 @@ Features includes:
 - Grid validation;
 - Undo & redo;
 - Shortcuts (grid or controls must be focussed);
+- Choosing a random seed;
 
 Planned features:
-- Injecting a random seed;
 - Highlighting numbers corresponding to the current control;
 - New interface (responsive, better menus);
 - Variable size grid;

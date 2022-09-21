@@ -1,9 +1,10 @@
-import { groupBySet, shuffle, zip } from "../helpers/array.helper";
+import { groupBySet, zip } from "../helpers/array.helper";
+import { RandomFunc, shuffle} from "../helpers/random.helper";
 import { DefaultMap } from "../helpers/default-map";
 import { equivalent } from "../helpers/set.helper";
 import { Cell } from "./cell";
 import { CellCollection } from "./cell-collection";
-import { CellsByPosition, Grid } from "./grid";
+import { Grid } from "./grid";
 
 const ITERATION_COUNT = 64;
 
@@ -19,6 +20,7 @@ export class JigsawGrid extends Grid {
 		WIDTH: number,
 		HEIGHT: number,
 		SECTION_COUNT: number,
+        private random: RandomFunc,
         skipShuffle: boolean = false
     ){
         super(WIDTH, HEIGHT, SECTION_COUNT);
@@ -30,9 +32,9 @@ export class JigsawGrid extends Grid {
     }
 
     override clone(): JigsawGrid {
-        const result = new JigsawGrid(this.WIDTH, this.HEIGHT, this.SECTION_COUNT, true);
+        const result = new JigsawGrid(this.WIDTH, this.HEIGHT, this.SECTION_COUNT, this.random, true);
         const sectionMapping = new Map(zip(this._sections, result._sections));
-		const ordering = (a: Cell, b: Cell) => { 
+		const ordering = (a: Cell, b: Cell) => {
 			return a.x !== b.x ? b.x - a.x : b.y - a.y;
 		};
 
@@ -62,13 +64,13 @@ export class JigsawGrid extends Grid {
     }
 
     private swap(): boolean {
-        const sections = shuffle(this._sections);
+        const sections = shuffle(this._sections, this.random);
         for (const section of sections) {
             const cellsByNeighbouringSection = new DefaultMap<Section, Set<Cell>>();
-            const cellsOfNeighbouringSection = new Set<Cell>();
+            const neighbouringCells = new Set<Cell>();
 
             for (const cell of this._cellsBySection.get(section)!) {
-                for (const neighbour of this.neighbouringCells(cell, this.cellsByPosition)) {
+                for (const neighbour of this.neighbouringCells(cell)) {
                     if (neighbour.section === section) {
                         continue;
                     }
@@ -76,22 +78,23 @@ export class JigsawGrid extends Grid {
                     cellsByNeighbouringSection
                         .getOrDefault(neighbour.section, () => new Set<Cell>())
                         .add(cell);
-                    cellsOfNeighbouringSection.add(neighbour);
+                    neighbouringCells.add(neighbour);
                 }
             }
 
-            for (const neighbour of shuffle(cellsOfNeighbouringSection)) {
-                for (const cellNextToNeighbour of shuffle(cellsByNeighbouringSection.get(neighbour.section)!)) {
-                    this.swapSections(neighbour, cellNextToNeighbour, this._cellsBySection);
+            for (const neighbour of shuffle(neighbouringCells, this.random)) {
+                const cellsNextToNeighbour = cellsByNeighbouringSection.get(neighbour.section)!;
+                for (const cellNextToNeighbour of shuffle(cellsNextToNeighbour, this.random)) {
+                    this.swapSections(neighbour, cellNextToNeighbour);
 
                     if (
-                        this.isSectionContiguous(neighbour.section, this._cellsBySection, this.cellsByPosition)
-                        && this.isSectionContiguous(cellNextToNeighbour.section, this._cellsBySection, this.cellsByPosition)
+                        this.isSectionContiguous(neighbour.section)
+                        && this.isSectionContiguous(cellNextToNeighbour.section)
                     ) {
                         return true;
                     }
 
-                    this.swapSections(neighbour, cellNextToNeighbour, this._cellsBySection);
+                    this.swapSections(neighbour, cellNextToNeighbour);
                 }
             }
         }
@@ -99,7 +102,7 @@ export class JigsawGrid extends Grid {
         return false;
     }
 
-    private neighbouringCells(cell: Cell, cellsByPosition: CellsByPosition): Cell[] {
+    private neighbouringCells(cell: Cell): Cell[] {
         const neighboursPosition: Array<Position> = [
             cell.position(-1, 0),
             cell.position(+1, 0),
@@ -110,7 +113,7 @@ export class JigsawGrid extends Grid {
         return neighboursPosition
             .reduce(
                 (acc, x) => {
-                    const neighbour = cellsByPosition.get(x);
+                    const neighbour = this.cellsByPosition.get(x);
                     if (neighbour !== undefined) {
                         acc.push(neighbour);
                     }
@@ -120,11 +123,9 @@ export class JigsawGrid extends Grid {
     }
 
     private isSectionContiguous(
-        section: Section, 
-        cellsBySection: CellsBySection, 
-        cellsByPosition: CellsByPosition
+        section: Section
     ): boolean {
-        const cells = cellsBySection.get(section)!;
+        const cells = this._cellsBySection.get(section)!;
         const visited = new Set<Cell>();
         const toVisit = Array.from([cells.values().next().value]);
 
@@ -137,22 +138,22 @@ export class JigsawGrid extends Grid {
             }
 
             toVisit.push(
-                ...this.neighbouringCells(cell, cellsByPosition)
+                ...this.neighbouringCells(cell)
                     .filter(x => x.section === section));
         }
 
         return equivalent(visited, cells);
     }
 
-    private swapSections(a: Cell, b: Cell, cellsBySection: CellsBySection): void {
-        cellsBySection.get(a.section)!.delete(a);
-        cellsBySection.get(b.section)!.delete(b);
+    private swapSections(a: Cell, b: Cell): void {
+        this._cellsBySection.get(a.section)!.delete(a);
+        this._cellsBySection.get(b.section)!.delete(b);
 
         const tmp = a.section;
         a.section = b.section;
         b.section = tmp;
 
-        cellsBySection.get(a.section)!.add(a);
-        cellsBySection.get(b.section)!.add(b);
+        this._cellsBySection.get(a.section)!.add(a);
+        this._cellsBySection.get(b.section)!.add(b);
     }
 }

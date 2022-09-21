@@ -1,10 +1,14 @@
 import { Grid } from './grid';
 import { Cell } from './cell';
-import { shuffle } from '../helpers/array.helper';
+import { RandomFunc, shuffle } from "../helpers/random.helper";
 
 const ITERATION_LIMIT = 100_000;
 
 export class GridGenerator {
+	constructor(private _random: RandomFunc) {
+	}
+
+
 	iteration: number = 0;
 
 	/**
@@ -71,7 +75,7 @@ export class GridGenerator {
 			return false;
 		}
 
-		const values = shuffle(cell.availableValues());
+		const values = shuffle(cell.availableValues(), this._random);
 		for (let i = 0; i < values.length; i++) {
 			const value = values[i]!;
 			cell.setValue(value);
